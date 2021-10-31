@@ -1,51 +1,41 @@
-#include <fstream>
-#include <iterator>
-#include <stdexcept>
-#include <string>
 #include <iostream>
-#include <vector>
-#include <algorithm>
-#include <exception>
+#include <boost/program_options.hpp>
 
-using ios = std::ios;
-const int FF = 255;
-const int D9 = 217;
+#include "bot.hpp"
+#include "utils.hpp"
 
-void HideText(const std::string& text, const std::string& image_path){
-    std::ofstream img(image_path, ios::binary | ios::app);
-    img << text;
-    img.close();
-}
+namespace po = boost::program_options;
 
-std::string ExtractText(const std::string& image_path){
-    std::ifstream img(image_path, ios::binary);
+int main(int argc, char* argv[]){
+    // Parsing command line args
+    po::options_description desc("Usage");
+    desc.add_options()
+        ("token", po::value<std::string>(), "Bot token.")
+        ("port" , po::value<int>()->default_value(8080), "Port on which to run bot server.")
+        ("webhook", po::value<std::string>(), "Webhook url which would be registered via Telegram API.")
+    ;
 
-    // reading image to vector of unsigned char
-    std::vector<unsigned char> buffer (std::istreambuf_iterator<char>(img), {});
-    std::vector<unsigned char>::iterator it = buffer.begin();
+    po::variables_map opts;
+    po::store(po::parse_command_line(argc, argv, desc), opts);
 
-    // finding FFD9 in file
-    while (true){
-        it = std::find_if(it, buffer.end(), [](auto x){return static_cast<int>(x) == FF;});
-
-        // check EOF
-        if (it == buffer.end() || next(it) == buffer.end()){
-            break;
-        }
-        ++it;
-
-        // check D9 after FF found
-        if (static_cast<int>(*it) == D9){
-            ++it;
-            return std::string(it, buffer.end());
-        }
+    try {
+        po::notify(opts);
+    } catch (std::exception& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
     }
-    throw std::runtime_error("Message not found.");
-}
 
+    signal(SIGINT, [](int s) {
+        std::cerr << "SIGINT got" << std::endl;
+        exit(0);
+    });
 
-int main(){
-    // HideText("Sample message", "./test.jpg");
-    std::cout << ExtractText("test.jpg");
+    // creating and running bot
+    Config conf(opts["port"].as<int>(), opts["webhook"].as<std::string>());
+    VeiledBot bot(opts["token"].as<std::string>(), conf);
+
+    std::cout << bot.GetInfo() << std::endl;
+    bot.RunWebwookServer();
+
     return 0;
 }

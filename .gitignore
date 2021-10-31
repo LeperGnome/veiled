@@ -1,2 +1,9 @@
 *.swp
+
 a.out
+veiled-bot
+
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+Makefile
