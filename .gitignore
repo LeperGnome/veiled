@@ -1,7 +1,9 @@
 *.swp
+.vscode/
 
 a.out
 veiled-bot
+build
 
 CMakeFiles
 CMakeCache.txt

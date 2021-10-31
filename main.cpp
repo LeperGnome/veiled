@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
     desc.add_options()
         ("token", po::value<std::string>(), "Bot token.")
         ("port" , po::value<int>()->default_value(8080), "Port on which to run bot server.")
-        ("webhook", po::value<std::string>(), "Webhook url which would be registered via Telegram API.")
+        ("webhook", po::value<std::string>()->default_value(""), "Webhook url which would be registered via Telegram API.")
     ;
 
     po::variables_map opts;
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]){
     VeiledBot bot(opts["token"].as<std::string>(), conf);
 
     std::cout << bot.GetInfo() << std::endl;
-    bot.RunWebwookServer();
+    bot.RunLongPoll();
 
     return 0;
 }

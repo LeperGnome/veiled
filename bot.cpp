@@ -9,23 +9,23 @@ VeiledBot::VeiledBot(const std::string& token, const Config& conf)
     : bot_(token)
     , config(conf)
     {
+        bot_.getApi().deleteWebhook();
         initActions();
+        std::cout << "Bot initialized" << std::endl;
     }
 
 void VeiledBot::initActions(){
     // TODO: logging
     std::cout << "Initialized reply actions" << std::endl;
     
-    // TODO: events are not registering?
-    bot_.getEvents().onCommand("start", [this](TgBot::Message::Ptr message) {
-        this->bot_.getApi().sendMessage(message->chat->id, "Hi!");
+    bot_.getEvents().onCommand("start", [&](TgBot::Message::Ptr message) {
+        bot_.getApi().sendMessage(message->chat->id, "Hi!");
     });
-    bot_.getEvents().onAnyMessage([this](TgBot::Message::Ptr message) {
-        std::cout << "User wrote: " << message->text << std::endl;
+    bot_.getEvents().onAnyMessage([&](TgBot::Message::Ptr message) {
         if (StringTools::startsWith(message->text, "/start")) {
             return;
         }
-        this->bot_.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
+        bot_.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
     });
 
 }
@@ -36,10 +36,31 @@ std::string VeiledBot::GetInfo() const {
     return out.str();
 }
 
-void VeiledBot::RunWebwookServer(){
+void VeiledBot::RunLongPoll(){
     try {
+        TgBot::TgLongPoll longPoll(bot_);
+        while (true) { 
+            std::cout << "LongPoll in progress..." << std::endl;
+            longPoll.start();
+        }
+    } catch (TgBot::TgException& e) {
+        // TODO: logging
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+void VeiledBot::RunWebwookServer(){
+    /*
+        NOT WORKING!
+        Issue with TgBot-cpp
+        See https://github.com/reo7sp/tgbot-cpp/issues/109
+    */
+    try {
+        if (config.webhookUrl.empty()){
+            throw std::invalid_argument("Webhook url is empty.");
+        }
         TgBot::TgWebhookTcpServer webhookServer(config.port, bot_);
-        std::cout << "Server starting" << std::endl;
+        std::cout << "Webhook bot starting" << std::endl;
         bot_.getApi().setWebhook(config.webhookUrl);
         webhookServer.start();
     } catch (std::exception& e) {

@@ -13,7 +13,9 @@ class VeiledBot {
 public:
     VeiledBot (const std::string& token, const Config& c);
     void RunWebwookServer ();
+    void RunLongPoll ();
     std::string GetInfo () const;
+
 
 private:
     TgBot::Bot bot_;
