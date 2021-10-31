@@ -17,9 +17,9 @@ endif()
 
 add_executable(
     veiled-bot 
-    main.cpp
-    bot.cpp
-    utils.cpp
+    src/main.cpp
+    src/bot.cpp
+    src/utils.cpp
 )
 
 target_link_libraries(veiled-bot /usr/local/lib/libTgBot.a ${CMAKE_THREAD_LIBS_INIT} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
