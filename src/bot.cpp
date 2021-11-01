@@ -22,12 +22,25 @@ void VeiledBot::initActions(){
         bot_.getApi().sendMessage(message->chat->id, "Hi!");
     });
     bot_.getEvents().onAnyMessage([&](TgBot::Message::Ptr message) {
-        if (StringTools::startsWith(message->text, "/start")) {
-            return;
-        }
-        bot_.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
-    });
+        auto user_document = message->document;
+        if (user_document){
+            auto caption = message->caption;
+            if (caption.empty()){ 
+                // TODO: try to exctract text
+                bot_.getApi().sendMessage(message->chat->id, 
+                    "Документ и текст должны быть в одном сообщении");
+                return;
+            }
+            TgBot::File::Ptr file = bot_.getApi().getFile(user_document->fileId);
+            std::string file_content = bot_.getApi().downloadFile(file->filePath);
 
+            // TODO: save to tmp folder & perform operations & send back as InputFile
+            // 1. FileTools::write 
+            // 2. HideText(...) 
+            // 3. .sendDocument(..., TgBot::InputFile::fromFile())
+
+        }
+    });
 }
 
 std::string VeiledBot::GetInfo() const {
