@@ -6,7 +6,7 @@ set(Boost_USE_MULTITHREADED ON)
 
 find_package(Threads REQUIRED)
 find_package(OpenSSL REQUIRED)
-find_package(Boost COMPONENTS system program_options REQUIRED)
+find_package(Boost COMPONENTS system program_options filesystem REQUIRED)
 find_package(CURL)
 
 include_directories(/usr/lib /usr/local/include ${OPENSSL_INCLUDE_DIR} ${Boost_INCLUDE_DIR})

@@ -4,6 +4,7 @@
 a.out
 veiled-bot
 build
+veiled_static_tmp
 
 CMakeFiles
 CMakeCache.txt

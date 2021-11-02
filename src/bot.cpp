@@ -1,6 +1,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <boost/filesystem.hpp>
 
 #include "bot.hpp"
 
@@ -11,8 +12,17 @@ VeiledBot::VeiledBot(const std::string& token, const Config& conf)
     {
         bot_.getApi().deleteWebhook();
         initActions();
+        createTmpDir();
         std::cout << "Bot initialized" << std::endl;
     }
+
+void VeiledBot::createTmpDir(){
+    boost::filesystem::path dir(tmp_folder);
+    if(boost::filesystem::create_directory(dir))
+    {
+        std::cerr<< "Directory Created: "<<tmp_folder<<std::endl;
+    }
+}
 
 void VeiledBot::initActions(){
     // TODO: logging
@@ -24,21 +34,23 @@ void VeiledBot::initActions(){
     bot_.getEvents().onAnyMessage([&](TgBot::Message::Ptr message) {
         auto user_document = message->document;
         if (user_document){
-            auto caption = message->caption;
+            TgBot::File::Ptr file = bot_.getApi().getFile(user_document->fileId);
+            std::string tmp_filepath = tmp_folder + file->fileId;
+            std::string file_content = bot_.getApi().downloadFile(file->filePath);
+            FileTools::write(file_content, tmp_filepath);
+
+            std::string caption = message->caption;
             if (caption.empty()){ 
                 // TODO: try to exctract text
                 bot_.getApi().sendMessage(message->chat->id, 
                     "Документ и текст должны быть в одном сообщении");
                 return;
+            } else {
+                HideText(caption, tmp_filepath);
+                auto out_file = TgBot::InputFile::fromFile(tmp_filepath, user_document->mimeType);
+                out_file->fileName = user_document->fileName;
+                bot_.getApi().sendDocument(message->chat->id, out_file);
             }
-            TgBot::File::Ptr file = bot_.getApi().getFile(user_document->fileId);
-            std::string file_content = bot_.getApi().downloadFile(file->filePath);
-
-            // TODO: save to tmp folder & perform operations & send back as InputFile
-            // 1. FileTools::write 
-            // 2. HideText(...) 
-            // 3. .sendDocument(..., TgBot::InputFile::fromFile())
-
         }
     });
 }

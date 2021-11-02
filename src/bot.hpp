@@ -20,5 +20,7 @@ public:
 private:
     TgBot::Bot bot_;
     const Config config;
+    const std::string tmp_folder = "veiled_static_tmp/";
     void initActions ();
+    void createTmpDir ();
 };
