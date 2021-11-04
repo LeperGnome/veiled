@@ -8,8 +8,14 @@ find_package(Threads REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Boost COMPONENTS system program_options filesystem REQUIRED)
 find_package(CURL)
+find_package(ImageMagick COMPONENTS Magick++)
 
-include_directories(/usr/lib /usr/local/include ${OPENSSL_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=16 )
+add_definitions( -DMAGICKCORE_HDRI_ENABLE=0 )
+
+include_directories(/usr/lib /usr/local/include ${OPENSSL_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${ImageMagick_INCLUDE_DIRS})
+
+
 if (CURL_FOUND)
     include_directories(${CURL_INCLUDE_DIRS})
     add_definitions(-DHAVE_CURL)
@@ -22,4 +28,4 @@ add_executable(
     src/utils.cpp
 )
 
-target_link_libraries(veiled-bot /usr/local/lib/libTgBot.a ${CMAKE_THREAD_LIBS_INIT} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(veiled-bot /usr/local/lib/libTgBot.a ${CMAKE_THREAD_LIBS_INIT} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} ${ImageMagick_LIBRARIES})

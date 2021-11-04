@@ -3,13 +3,13 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <Magick++.h>
 
 #include "utils.hpp"
 
 
 const int FF = 255;
 const int D9 = 217;
-
 
 Config::Config(int p, std::string wu)
     : port(p)

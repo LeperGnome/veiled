@@ -41,10 +41,12 @@ void VeiledBot::initActions(){
 
             std::string caption = message->caption;
             if (caption.empty()){ 
-                // TODO: try to exctract text
-                bot_.getApi().sendMessage(message->chat->id, 
-                    "Документ и текст должны быть в одном сообщении");
-                return;
+                std::string hidden_text = ExtractText(tmp_filepath);
+                std::string reply_msg = "Текст не найден =(";
+                if (!hidden_text.empty()){
+                    reply_msg = "Найден текст: \"" + hidden_text + "\"";
+                }
+                bot_.getApi().sendMessage(message->chat->id, reply_msg);
             } else {
                 HideText(caption, tmp_filepath);
                 auto out_file = TgBot::InputFile::fromFile(tmp_filepath, user_document->mimeType);
