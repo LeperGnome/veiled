@@ -48,9 +48,13 @@ void VeiledBot::initActions(){
                 }
                 bot_.getApi().sendMessage(message->chat->id, reply_msg);
             } else {
-                HideText(caption, tmp_filepath);
-                auto out_file = TgBot::InputFile::fromFile(tmp_filepath, user_document->mimeType);
-                out_file->fileName = user_document->fileName;
+                // TODO: check for allowed filetype
+                std::string jpg_image_path = ConvertToJPEG(tmp_filepath);
+                HideText(caption, jpg_image_path);
+
+                auto out_file = TgBot::InputFile::fromFile(jpg_image_path, user_document->mimeType);
+                // TODO: something smarter with extesion
+                out_file->fileName = user_document->fileName + ".jpeg";
                 bot_.getApi().sendDocument(message->chat->id, out_file);
             }
         }

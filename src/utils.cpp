@@ -17,6 +17,14 @@ Config::Config(int p, std::string wu)
     {
     }
 
+std::string ConvertToJPEG(const std::string& path){
+    Magick::Image img(path);
+    img.magick("JPEG");
+    std::string new_path = path + ".jpeg";
+    img.write(new_path);
+    return new_path;
+}
+
 void HideText(const std::string& text, const std::string& image_path){
     std::ofstream img(image_path, std::ios::binary | std::ios::app);
     img << text;
