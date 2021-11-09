@@ -13,7 +13,14 @@
 
 const int FF = 255;
 const int D9 = 217;
-const std::set<std::string> ALLOWED_EXTENSIONS = {"PNG", "JPG", "JPEG", "GIF", "TIFF"};
+const std::set<std::string> ALLOWED_EXTENSIONS = {
+    "PNG", 
+    "JPG", 
+    "JPEG", 
+    "GIF", 
+    "TIFF", 
+    "HEIC"
+};
 
 Config::Config(int p, std::string wu)
     : port(p)
@@ -23,6 +30,7 @@ Config::Config(int p, std::string wu)
 
 bool IsAllowedExtension(const std::string filename){
     std::string extension = filename.substr(filename.find_last_of('.') + 1);
+    for (auto& c: extension) c = std::toupper(c);
     return ALLOWED_EXTENSIONS.count(extension);
 }
 

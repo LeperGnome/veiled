@@ -30,18 +30,24 @@ void VeiledBot::initActions(){
     
     bot_.getEvents().onCommand("start", [&](TgBot::Message::Ptr message) {
         std::stringstream start_message;
-        start_message << "Кладу текст в картинки и извлекаю его."
-                      << "\nЕсли хочешь положить, пришли картинку как документ с описанием (должно быть одним сообщением)."
-                      << "\nЕсли хочешь извлечь, то просто пришли картинку, как документ. Я сделаю, что смогу.";
-        bot_.getApi().sendMessage(message->chat->id, "Hi!");
+        start_message << "*Кладу текст в картинки и извлекаю его.*\n"
+                      << "\nЕсли хочешь _положить_, пришли картинку как документ с описанием (должно быть одним сообщением)."
+                      << "\nЕсли хочешь _извлечь_, то просто пришли картинку, как документ. Я сделаю, что смогу."
+                      << "\n\n P.S. я в бете, не всегда работаю.";
+        bot_.getApi().sendMessage(
+            message->chat->id, 
+            start_message.str(), 
+            false, 0, {}, 
+            "Markdown"
+        );
     });
     bot_.getEvents().onAnyMessage([&](TgBot::Message::Ptr message) {
         auto user_document = message->document;
-        if (!IsAllowedExtension(user_document->fileName)){
-            bot_.getApi().sendMessage(message->chat->id, "Расширение не поддерживается");
-            return;
-        }
         if (user_document){
+            if (!IsAllowedExtension(user_document->fileName)){
+                bot_.getApi().sendMessage(message->chat->id, "Расширение не поддерживается");
+                return;
+            }
             TgBot::File::Ptr file = bot_.getApi().getFile(user_document->fileId);
             std::string tmp_filepath = tmp_folder + file->fileId;
             std::string file_content = bot_.getApi().downloadFile(file->filePath);
@@ -78,15 +84,15 @@ std::string VeiledBot::GetInfo() const {
 }
 
 void VeiledBot::RunLongPoll(){
-    try {
-        TgBot::TgLongPoll longPoll(bot_);
-        while (true) { 
+    TgBot::TgLongPoll longPoll(bot_);
+    while (true) { 
+        try {
             std::cout << "LongPoll in progress..." << std::endl;
             longPoll.start();
+        } catch (TgBot::TgException& e) {
+            // TODO: logging
+            std::cerr << e.what() << std::endl;
         }
-    } catch (TgBot::TgException& e) {
-        // TODO: logging
-        std::cerr << e.what() << std::endl;
     }
 }
 
