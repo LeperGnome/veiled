@@ -29,10 +29,18 @@ void VeiledBot::initActions(){
     std::cout << "Initialized reply actions" << std::endl;
     
     bot_.getEvents().onCommand("start", [&](TgBot::Message::Ptr message) {
+        std::stringstream start_message;
+        start_message << "Кладу текст в картинки и извлекаю его."
+                      << "\nЕсли хочешь положить, пришли картинку как документ с описанием (должно быть одним сообщением)."
+                      << "\nЕсли хочешь извлечь, то просто пришли картинку, как документ. Я сделаю, что смогу.";
         bot_.getApi().sendMessage(message->chat->id, "Hi!");
     });
     bot_.getEvents().onAnyMessage([&](TgBot::Message::Ptr message) {
         auto user_document = message->document;
+        if (!IsAllowedExtension(user_document->fileName)){
+            bot_.getApi().sendMessage(message->chat->id, "Расширение не поддерживается");
+            return;
+        }
         if (user_document){
             TgBot::File::Ptr file = bot_.getApi().getFile(user_document->fileId);
             std::string tmp_filepath = tmp_folder + file->fileId;
@@ -53,10 +61,12 @@ void VeiledBot::initActions(){
                 HideText(caption, jpg_image_path);
 
                 auto out_file = TgBot::InputFile::fromFile(jpg_image_path, user_document->mimeType);
-                // TODO: something smarter with extesion
-                out_file->fileName = user_document->fileName + ".jpeg";
+                out_file->fileName = SetExtensionToJPEG(user_document->fileName);
                 bot_.getApi().sendDocument(message->chat->id, out_file);
+
+                RemoveTMPFile(jpg_image_path);
             }
+            RemoveTMPFile(tmp_filepath);
         }
     });
 }

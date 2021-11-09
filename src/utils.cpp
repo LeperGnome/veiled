@@ -1,6 +1,9 @@
+#include <cstdio>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 #include <string>
+#include <set>
 #include <vector>
 #include <algorithm>
 #include <Magick++.h>
@@ -10,6 +13,7 @@
 
 const int FF = 255;
 const int D9 = 217;
+const std::set<std::string> ALLOWED_EXTENSIONS = {"PNG", "JPG", "JPEG", "GIF", "TIFF"};
 
 Config::Config(int p, std::string wu)
     : port(p)
@@ -17,13 +21,32 @@ Config::Config(int p, std::string wu)
     {
     }
 
+bool IsAllowedExtension(const std::string filename){
+    std::string extension = filename.substr(filename.find_last_of('.') + 1);
+    return ALLOWED_EXTENSIONS.count(extension);
+}
+
+std::string SetExtensionToJPEG(const std::string& filename){
+    return filename.substr(0, filename.find_last_of('.'))+".jpeg";
+}
+
 std::string ConvertToJPEG(const std::string& path){
     Magick::Image img(path);
     img.magick("JPEG");
-    std::string new_path = path + ".jpeg";
+    std::string new_path = SetExtensionToJPEG(path);
     img.write(new_path);
     return new_path;
 }
+
+void RemoveTMPFile(const std::string& path){
+    // TODO logging
+    if(std::remove(path.c_str()) != 0){
+        std::cout << "Error removig file: " << path << std::endl;
+    } else {
+        std::cout << "File " << path << " successfully deleted" << std::endl;
+    }
+}
+
 
 void HideText(const std::string& text, const std::string& image_path){
     std::ofstream img(image_path, std::ios::binary | std::ios::app);
