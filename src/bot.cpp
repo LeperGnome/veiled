@@ -42,6 +42,7 @@ void VeiledBot::initActions(){
         );
     });
     bot_.getEvents().onAnyMessage([&](TgBot::Message::Ptr message) {
+        // TODO: refactor
         auto user_document = message->document;
         std::string user_fullname = message->from->firstName + ' ' + message->from->lastName;
         if (user_document){
@@ -112,7 +113,6 @@ void VeiledBot::RunWebwookServer(){
         bot_.getApi().setWebhook(config.webhookUrl);
         webhookServer.start();
     } catch (std::exception& e) {
-        // TODO: logging
         std::cerr << e.what() << std::endl;
     }
 }
