@@ -19,7 +19,8 @@ const std::set<std::string> ALLOWED_EXTENSIONS = {
     "JPEG", 
     "GIF", 
     "TIFF", 
-    "HEIC"
+    "HEIC",
+    "JFIF"
 };
 
 Config::Config(int p, std::string wu)

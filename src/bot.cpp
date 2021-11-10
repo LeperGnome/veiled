@@ -30,8 +30,8 @@ void VeiledBot::initActions(){
     
     bot_.getEvents().onCommand("start", [&](TgBot::Message::Ptr message) {
         std::stringstream start_message;
-        start_message << "*Кладу текст в картинки и извлекаю его.*\n"
-                      << "\nЕсли хочешь _положить_, пришли картинку как документ с описанием (должно быть одним сообщением)."
+        start_message << "*Прячу текст в картинки и извлекаю его.*\n"
+                      << "\nЕсли хочешь _спрятать_, напиши сообщение которое хочешь спрятать и прикрепи документ в одном сообщении."
                       << "\nЕсли хочешь _извлечь_, то просто пришли картинку, как документ. Я сделаю, что смогу."
                       << "\n\n P.S. я в бете, не всегда работаю.";
         bot_.getApi().sendMessage(
@@ -91,7 +91,7 @@ void VeiledBot::RunLongPoll(){
     while (true) { 
         try {
             longPoll.start();
-        } catch (TgBot::TgException& e) {
+        } catch (std::exception& e) {
             // TODO: logging
             std::cerr << e.what() << std::endl;
         }
