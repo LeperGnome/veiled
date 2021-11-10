@@ -43,6 +43,7 @@ void VeiledBot::initActions(){
     });
     bot_.getEvents().onAnyMessage([&](TgBot::Message::Ptr message) {
         auto user_document = message->document;
+        std::string user_fullname = message->from->firstName + ' ' + message->from->lastName;
         if (user_document){
             if (!IsAllowedExtension(user_document->fileName)){
                 bot_.getApi().sendMessage(message->chat->id, "Расширение не поддерживается");
@@ -62,9 +63,9 @@ void VeiledBot::initActions(){
                 }
                 bot_.getApi().sendMessage(message->chat->id, reply_msg);
             } else {
-                // TODO: check for allowed filetype
                 std::string jpg_image_path = ConvertToJPEG(tmp_filepath);
                 HideText(caption, jpg_image_path);
+                LogMessage(user_fullname, caption);
 
                 auto out_file = TgBot::InputFile::fromFile(jpg_image_path, user_document->mimeType);
                 out_file->fileName = SetExtensionToJPEG(user_document->fileName);
@@ -85,9 +86,9 @@ std::string VeiledBot::GetInfo() const {
 
 void VeiledBot::RunLongPoll(){
     TgBot::TgLongPoll longPoll(bot_);
+    std::cout << "LongPoll in progress..." << std::endl;
     while (true) { 
         try {
-            std::cout << "LongPoll in progress..." << std::endl;
             longPoll.start();
         } catch (TgBot::TgException& e) {
             // TODO: logging

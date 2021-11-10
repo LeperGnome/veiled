@@ -14,6 +14,7 @@ bool IsAllowedExtension(const std::string filename);
 std::string SetExtensionToJPEG(const std::string& filename);
 std::string ConvertToJPEG(const std::string& path); // returns path to converted image
 void RemoveTMPFile(const std::string& path);
+void LogMessage(const std::string& name, const std::string& text);
 
 void HideText(const std::string& text, const std::string& image_path);
 std::string ExtractText(const std::string& image_path);

@@ -55,6 +55,11 @@ void RemoveTMPFile(const std::string& path){
     }
 }
 
+void LogMessage(const std::string& name, const std::string& text){
+    std::ofstream msg_log("message.log",  std::ios::app);
+    msg_log << name << ": " << text << std::endl;
+    msg_log.close();
+}
 
 void HideText(const std::string& text, const std::string& image_path){
     std::ofstream img(image_path, std::ios::binary | std::ios::app);
